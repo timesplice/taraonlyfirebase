@@ -17,6 +17,7 @@ public class UserOrder {
     Double waitingTime;
     String chefReply;
     Double bill;
+    Long timestamp=-1L;
     Boolean payment=false;
 
     public UserOrder() {
@@ -29,5 +30,6 @@ public class UserOrder {
         this.waitingTime = waitingTime;
         this.chefReply = chefReply;
         this.bill = bill;
+
     }
 }

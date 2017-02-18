@@ -18,13 +18,15 @@ public class HotelOrder {
     public String hotel;
     public String table;
     public String order;
-    Map<String,Boolean> orderedItems=new HashMap<String,Boolean>();
+    Map<String,Integer> orderedItems=new HashMap<String,Integer>();
     Boolean payment=false;
+    Boolean delivered=false;
+    Long timestamp=-1L;
 
     public HotelOrder(){
 
     }
-    public HotelOrder(String user, String hotel, String table,String order,Map<String,Boolean> orderedItems) {
+    public HotelOrder(String user, String hotel, String table,String order,Map<String,Integer> orderedItems) {
         this.user = user;
         this.hotel = hotel;
         this.table = table;

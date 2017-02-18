@@ -1,11 +1,19 @@
 package com.tara.tara;
 
+
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -14,7 +22,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.MutableData;
 import com.google.firebase.database.Transaction;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.OnPausedListener;
+import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.tara.tara.models.Comment;
 import com.tara.tara.models.FoodItem;
 import com.tara.tara.models.FoodTable;
@@ -23,6 +34,13 @@ import com.tara.tara.models.HotelOrder;
 import com.tara.tara.models.User;
 import com.tara.tara.models.UserOrder;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,7 +58,7 @@ public class Home extends AppCompatActivity {
     private List<String> foodIds;
     private String orderId;
 
-    private Button adduserBtn,addHotel,addOrder,addComment;
+    private Button adduserBtn,addHotel,addOrder,addComment,addCatImage;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,6 +93,14 @@ public class Home extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 addComment();
+            }
+        });
+
+        addCatImage = (Button)findViewById(R.id.addCatImage);
+        addCatImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addImageToCategory(hotelId);
             }
         });
 
@@ -155,9 +181,9 @@ public class Home extends AppCompatActivity {
         //addspinner
         DatabaseReference fDBReference=fDatabase.getReference("hotelOrders").child(hotelId);
         String orderKey = fDBReference.push().getKey();
-        Map<String,Boolean> orderedItems = new HashMap<String,Boolean>();
+        Map<String,Integer> orderedItems = new HashMap<String,Integer>();
         for(String order:foodIds) {
-            orderedItems.put(order,true);
+            orderedItems.put(order,1);
         }
         HotelOrder hotelOrder=new HotelOrder(userId,hotelId,tableId,orderKey,orderedItems);
 
@@ -295,9 +321,69 @@ public class Home extends AppCompatActivity {
     }
 
     public void addImageToCategory(String hotel){
-        FirebaseStorage storage = FirebaseStorage.getInstance();
-        StorageReference storageRef = storage.getReference();
+        try {
+            String imageUrl = "https://www.wagamama.com/-/media/WagamamaMainsite/hero-pod-images/salads.jpg";
+            FirebaseStorage storage = FirebaseStorage.getInstance();
+            StorageReference storageRef = storage.getReference(hotel);
+           // InputStream stream =   getResources().openRawResource(R.drawable.salads);
 
+            Drawable drawable=getApplicationContext().getResources().getDrawable(R.drawable.salads);
+            BitmapDrawable bitDw = ((BitmapDrawable) drawable);
+            Bitmap bitmap = bitDw.getBitmap();
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+            byte[] data = baos.toByteArray();
+
+            //new FileInputStream(new File("path/to/images/rivers.jpg"));
+            //Uri file = Uri.fromFile(new File("path/to/images/rivers.jpg"));
+            UploadTask uploadTask = storageRef.child("category/salads.jpg").putBytes(data);
+            uploadTask.addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    System.out.println("File Upload Failed");
+                }
+            }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
+                    Uri downloadUrl = taskSnapshot.getDownloadUrl();
+                    System.out.println("File upload OnSUCCESS:" + downloadUrl);
+                }
+            }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+                    double progress = (100.0 * taskSnapshot.getBytesTransferred()) / taskSnapshot.getTotalByteCount();
+                    System.out.println("Upload is " + progress + "% done");
+                }
+            }).addOnPausedListener(new OnPausedListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onPaused(UploadTask.TaskSnapshot taskSnapshot) {
+                    System.out.println("File Upload is paused");
+                }
+            });
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    private static InputStream OpenHttpConnection(String strURL)
+            throws IOException {
+        InputStream inputStream = null;
+        URL url = new URL(strURL);
+        URLConnection conn = url.openConnection();
+
+        try {
+            HttpURLConnection httpConn = (HttpURLConnection) conn;
+            //httpConn.setRequestMethod("GET");
+            httpConn.connect();
+
+            if (httpConn.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                inputStream = httpConn.getInputStream();
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return inputStream;
     }
 }
 
