@@ -194,7 +194,7 @@ public class Home extends AppCompatActivity {
     }
     public void addUserOrder(){
         DatabaseReference fDBReference=fDatabase.getReference("userOrders").child(userId);
-        UserOrder userOrder = new UserOrder(hotelId, tableId,orderId, 15.0, "chefReply", 2.0);
+        UserOrder userOrder = new UserOrder(hotelId, tableId,userId,orderId, 15.0, "chefReply", 2.0);
         fDBReference.child(orderId).setValue(userOrder);
 
         System.out.println("Add User Order");

@@ -13,17 +13,19 @@ import com.google.firebase.database.IgnoreExtraProperties;
 public class UserOrder {
     public String hotel;
     String table;
+    String user;
     String order;
     Double waitingTime;
     String chefReply;
     Double bill;
     Long timestamp=-1L;
+    Boolean delivered = false;
     Boolean payment=false;
 
     public UserOrder() {
     }
 
-    public UserOrder(String hotel, String table,String order, Double waitingTime, String chefReply, Double bill) {
+    public UserOrder(String hotel, String table,String user,String order, Double waitingTime, String chefReply, Double bill) {
         this.hotel = hotel;
         this.table = table;
         this.order = order;
