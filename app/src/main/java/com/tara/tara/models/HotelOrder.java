@@ -21,7 +21,8 @@ public class HotelOrder {
     Map<String,Integer> orderedItems=new HashMap<String,Integer>();
     Boolean payment=false;
     Boolean delivered=false;
-    Long timestamp=-1L;
+    Long timeStamp=-1L;
+    double waitingTime=0;
 
     public HotelOrder(){
 

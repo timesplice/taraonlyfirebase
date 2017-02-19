@@ -170,11 +170,11 @@ public class Home extends AppCompatActivity {
     }
 
     public void addOrder(){
-         hotelOrderChangeListener();
-         userOrderChangeListener();
-
+        // hotelOrderChangeListener();
         addHotelOrder();
         addUserOrder();
+        userOrderChangeListener();
+
     }
 
     public void addHotelOrder(){
@@ -194,9 +194,8 @@ public class Home extends AppCompatActivity {
     }
     public void addUserOrder(){
         DatabaseReference fDBReference=fDatabase.getReference("userOrders").child(userId);
-        UserOrder userOrder = new UserOrder(hotelId, tableId,userId,orderId, 15.0, "chefReply", 2.0);
+        UserOrder userOrder = new UserOrder(hotelId, tableId,userId,orderId);
         fDBReference.child(orderId).setValue(userOrder);
-
         System.out.println("Add User Order");
     }
 
@@ -289,7 +288,7 @@ public class Home extends AppCompatActivity {
     }
 
     public void userOrderChangeListener(){
-        DatabaseReference fDBReference=fDatabase.getReference("userOrders").child(hotelId);
+        DatabaseReference fDBReference=fDatabase.getReference("userOrders").child(userId);
         fDBReference.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {

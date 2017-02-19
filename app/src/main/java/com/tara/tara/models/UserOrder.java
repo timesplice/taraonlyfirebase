@@ -15,23 +15,21 @@ public class UserOrder {
     String table;
     String user;
     String order;
-    Double waitingTime;
+    Double waitingTime=0.0;
     String chefReply;
-    Double bill;
-    Long timestamp=-1L;
+    Double bill=0.0;
+    Long timeStamp=-1L;
     Boolean delivered = false;
     Boolean payment=false;
 
     public UserOrder() {
     }
 
-    public UserOrder(String hotel, String table,String user,String order, Double waitingTime, String chefReply, Double bill) {
+    public UserOrder(String hotel, String table,String user,String order) {
         this.hotel = hotel;
         this.table = table;
+        this.user = user;
         this.order = order;
-        this.waitingTime = waitingTime;
-        this.chefReply = chefReply;
-        this.bill = bill;
 
     }
 }
